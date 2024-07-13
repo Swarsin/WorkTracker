@@ -1,9 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-#from tkinter import ttk
-import time
 
-# change later to allow user to change these things
 work_min = 25
 short_break_min = 5
 long_break_min = 15
@@ -11,72 +8,85 @@ sessions_before_long_break = 4
 
 class ChangeTimingWindow(tk.Toplevel):
     def __init__(self):
-        super.__init__()
+        super().__init__() 
         self.title("Change Session Timings")
-        self.geometry("300x400")
+        self.geometry("350x200")
         
-        #add work textbox
-        work_label = tk.Label(self, "Work Duration: ")
+        # Add work textbox
+        work_label = tk.Label(self, text="Work Duration: ")
         work_label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
-        work_entry = tk.Entry(self, width=30)
-        work_entry.grid(row=0, column=1, padx=10, pady=10)
+        self.work_entry = tk.Entry(self, width=20)  
+        self.work_entry.grid(row=0, column=1, padx=10, pady=10)
         
-        #add short break textbox
-        short_break_label = tk.Label(self, "Short Break Duration: ")
+        # Add short break textbox
+        short_break_label = tk.Label(self, text="Short Break Duration: ")
         short_break_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
-        short_break_entry = tk.Entry(self, width=30)
-        short_break_entry.grid(row=1, column=1, padx=10, pady=10)
+        self.short_break_entry = tk.Entry(self, width=20) 
+        self.short_break_entry.grid(row=1, column=1, padx=10, pady=10)
 
-        #add long break textbox
-        long_break_label = tk.Label(self, "Long Break Duration: ")
+        # Add long break textbox
+        long_break_label = tk.Label(self, text="Long Break Duration: ")
         long_break_label.grid(row=2, column=0, padx=10, pady=10, sticky="e")
-        long_break_entry = tk.Entry(self, width=30)
-        long_break_entry.grid(row=2, column=1, padx=10, pady=10)
+        self.long_break_entry = tk.Entry(self, width=20) 
+        self.long_break_entry.grid(row=2, column=1, padx=10, pady=10)
 
-        #add short break textbox
-        sessions_before_long_break_label = tk.Label(self, "Sessions Before Long Break: ")
+        # Add sessions before long break textbox
+        sessions_before_long_break_label = tk.Label(self, text="Sessions Before Long Break: ")
         sessions_before_long_break_label.grid(row=3, column=0, padx=10, pady=10, sticky="e")
-        sessions_before_long_break_entry = tk.Entry(self, width=30)
-        sessions_before_long_break_entry.grid(row=3, column=1, padx=10, pady=10)
+        self.sessions_before_long_break_entry = tk.Entry(self, width=20)
+        self.sessions_before_long_break_entry.grid(row=3, column=1, padx=10, pady=10)
 
-    def getAllContents(self):
-        entry = work_entry.get()
-        
+        # Add change button
+        submit_button = tk.Button(self, text="Change", command=self.submit)
+        submit_button.grid(row=4, column=1, padx=10, pady=10)
 
+    def submit(self): #REMEMBER TO ADD VALIDATION SO THAT USER CANT ENTER STUPID SHIT
+        work_min = int(self.work_entry.get())
+        short_break_min = int(self.short_break_entry.get())  
+        long_break_min = int(self.long_break_entry.get()) 
+        sessions_before_long_break = int(self.sessions_before_long_break_entry.get())
+        #print(work_min, short_break_min, long_break_min, sessions_before_long_break)
+        self.destroy()
 
 class PomodoroTimer:
     def __init__(self, root):
-        #window variables
+        # window variables
         self.root = root
         self.root.title("Habit Tracker")
-        self.root.geometry("300x250")
+        self.root.geometry("300x300")
 
         self.timer_running = False
         self.sessions_completed = 0
         self.timer_seconds = work_min * 60
 
-        #create a Label in the window - above the timer
-        self.label = tk.Label(root, text=f"Pomodoro Timer, Session {self.sessions_completed + 1}", font=("Helvetica", 18))
+        # create a Label in the window - above the timer
+        self.label = tk.Label(root, text=f"Pomodoro Timer | Session {self.sessions_completed + 1}", font=("Helvetica", 18))
         self.label.pack(pady=20)
         
-        #create timer
+        # create timer
         self.timer_label = tk.Label(root, text=self.format_time(self.timer_seconds), font=("Helvetica", 48))
         self.timer_label.pack(pady=20)
         
-        #create start button
-        self.start_button = tk.Button(root, text="Start", command=self.start_timer)
-        self.start_button.pack(side="left", padx=20)
+        # create frame for buttons
+        button_frame = tk.Frame(root)
+        button_frame.pack(pady=20, fill='x')
 
-        #create button to open sessions timings window
+        # create start button
+        self.start_button = tk.Button(button_frame, text="Start", command=self.start_timer)
+        self.start_button.pack(side="left", padx=10)
+
+        # create reset button
+        self.reset_button = tk.Button(button_frame, text="Reset", command=self.reset_timer)
+        self.reset_button.pack(side="right", padx=10)
+
+        # create button to open sessions timings window
         self.change_timing_button = tk.Button(root, text="Change Timing", command=self.open_window)
-        self.change_timing_button.pack(side="bottom")
-        
-        #create reset button
-        self.reset_button = tk.Button(root, text="Reset", command=self.reset_timer)
-        self.reset_button.pack(side="right", padx=20)
-    
+        self.change_timing_button.pack(side="bottom", pady=10)
+
     def open_window(self):
-        pass
+        #global change_timing_window
+        change_timing_window = ChangeTimingWindow()
+        change_timing_window.mainloop()
 
     def start_timer(self):
         if not self.timer_running:
