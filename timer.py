@@ -110,7 +110,7 @@ class PomodoroTimer:
                 self.timer_seconds -= 1
                 self.timer_label.config(text=self.format_time(self.timer_seconds))
                 self.root.after(1000, self.update_timer)
-            else: #check over this again i dont really understand what the hell this is doing
+            else:
                 self.sessions_completed += 1
                 if self.sessions_completed % (sessions_before_long_break + 1) == 0:
                     self.timer_seconds = long_break_min * 60
