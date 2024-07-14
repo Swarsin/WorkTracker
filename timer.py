@@ -7,10 +7,11 @@ long_break_min = 15
 sessions_before_long_break = 4
 
 class ChangeTimingWindow(tk.Toplevel):
-    def __init__(self):
+    def __init__(self, pomdoro_timer):
         super().__init__() 
         self.title("Change Session Timings")
         self.geometry("350x200")
+        self.pomodoro_timer = pomdoro_timer
         
         # Add work textbox
         work_label = tk.Label(self, text="Work Duration: ")
@@ -41,11 +42,14 @@ class ChangeTimingWindow(tk.Toplevel):
         submit_button.grid(row=4, column=1, padx=10, pady=10)
 
     def submit(self): #REMEMBER TO ADD VALIDATION SO THAT USER CANT ENTER STUPID SHIT
+        global work_min, short_break_min, long_break_min, sessions_before_long_break
         work_min = int(self.work_entry.get())
         short_break_min = int(self.short_break_entry.get())  
         long_break_min = int(self.long_break_entry.get()) 
         sessions_before_long_break = int(self.sessions_before_long_break_entry.get())
         #print(work_min, short_break_min, long_break_min, sessions_before_long_break)
+
+        self.pomodoro_timer.update_timer_labels()
         self.destroy()
 
 class PomodoroTimer:
@@ -83,10 +87,17 @@ class PomodoroTimer:
         self.change_timing_button = tk.Button(root, text="Change Timing", command=self.open_window)
         self.change_timing_button.pack(side="bottom", pady=10)
 
+    def update_timer_labels(self):
+        self.timer_seconds = work_min * 60
+        self.timer_label.config(text=self.format_time(self.timer_seconds))
+
+        self.label.config(text=f"Pomodoro Timer | Session {self.sessions_completed + 1}")
+
     def open_window(self):
         #global change_timing_window
-        change_timing_window = ChangeTimingWindow()
+        change_timing_window = ChangeTimingWindow(app)
         change_timing_window.mainloop()
+        self.update_timer_labels()
 
     def start_timer(self):
         if not self.timer_running:
@@ -111,6 +122,7 @@ class PomodoroTimer:
                     self.timer_seconds = work_min * 60
                     messagebox.showinfo("Work Time", "Back to work!")
                 self.update_timer()
+                self.update_timer_labels()
     
     def reset_timer(self):
         self.timer_running = False
