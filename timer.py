@@ -5,6 +5,35 @@ work_min = 25
 short_break_min = 5
 long_break_min = 15
 sessions_before_long_break = 4
+work_goal = ""
+time_goal = 0
+
+class SetGoalWindow(tk.Toplevel):
+    def __init__(self):
+        super().__init__()
+        self.title("Set Goal")
+        self.geometry("350x200")
+        
+        #add work goal textbox
+        work_goal_label = tk.Label(self, text="Work Goal: ")
+        work_goal_label.grid(row=0, column=0, padx=10, pady=10, sticky="e")
+        self.work_goal_entry = tk.Entry(self, width=20)
+        self.work_goal_entry.grid(row=0, column=1, padx=10, pady=10)
+
+        #add time goal textbox
+        time_goal_label = tk.Label(self, text="Time Goal (in hrs): ")
+        time_goal_label.grid(row=1, column=0, padx=10, pady=10, sticky="e")
+        self.time_goal_entry = tk.Entry(self, width=20)
+        self.time_goal_entry.grid(row=1, column=1, padx=10, pady=10)
+
+        submit_button = tk.Button(self, text="Submit", command=self.submit)
+        submit_button.grid(row=2, column=1, padx=10, pady=10)
+
+    def submit(self):
+        work_goal = self.work_goal_entry.get()
+        time_goal = int(self.time_goal_entry.get())
+        #print(work_goal + str(time_goal))
+        self.destroy()
 
 class ChangeTimingWindow(tk.Toplevel):
     def __init__(self, pomdoro_timer):
@@ -62,9 +91,10 @@ class PomodoroTimer:
         self.timer_running = False
         self.sessions_completed = 0
         self.timer_seconds = work_min * 60
+        self.current_event = "Work!"
 
         # create a Label in the window - above the timer
-        self.label = tk.Label(root, text=f"Pomodoro Timer | Session {self.sessions_completed + 1}", font=("Helvetica", 18))
+        self.label = tk.Label(root, text=f"Pomodoro Timer | {self.current_event}", font=("Helvetica", 18))
         self.label.pack(pady=20)
         
         # create timer
@@ -84,14 +114,21 @@ class PomodoroTimer:
         self.reset_button.pack(side="right", padx=10)
 
         # create button to open sessions timings window
-        self.change_timing_button = tk.Button(root, text="Change Timing", command=self.open_window)
-        self.change_timing_button.pack(side="bottom", pady=10)
+        self.change_timing_button = tk.Button(button_frame, text="Change Timing", command=self.open_window)
+        self.change_timing_button.pack(side="bottom")
+
+        self.goal_button = tk.Button(button_frame, text="Set Goal", command=self.open_goal_window)
+        self.goal_button.pack(side="bottom", padx=10, pady=10)
+
+    def open_goal_window(self):
+        goal_window = SetGoalWindow()
+        goal_window.mainloop()
 
     def update_timer_labels(self):
         self.timer_seconds = work_min * 60
         self.timer_label.config(text=self.format_time(self.timer_seconds))
 
-        self.label.config(text=f"Pomodoro Timer | Session {self.sessions_completed + 1}")
+        self.label.config(text=f"Pomodoro Timer | {self.current_event}")
 
     def open_window(self):
         #global change_timing_window
@@ -110,17 +147,20 @@ class PomodoroTimer:
                 self.timer_seconds -= 1
                 self.timer_label.config(text=self.format_time(self.timer_seconds))
                 self.root.after(1000, self.update_timer)
-            else:
+            else: #need to redo this part - it's not as i want it currently
                 self.sessions_completed += 1
                 if self.sessions_completed % (sessions_before_long_break + 1) == 0:
                     self.timer_seconds = long_break_min * 60
-                    messagebox.showinfo("Break Time", "Take a long break!")
-                elif self.sessions_completed % 2 == 0:
+                    #messagebox.showinfo("Break Time", "Take a long break!")
+                    self.current_event = "Long Break!"
+                elif self.sessions_completed % 2 == 1:
                     self.timer_seconds = short_break_min * 60
-                    messagebox.showinfo("Break Time", "Take a short break!")
+                    #messagebox.showinfo("Break Time", "Take a short break!")
+                    self.current_event = "Short Break!"
                 else:
                     self.timer_seconds = work_min * 60
-                    messagebox.showinfo("Work Time", "Back to work!")
+                    #messagebox.showinfo("Work Time", "Back to work!")
+                    self.current_event = "Work!"
                 self.update_timer()
                 self.update_timer_labels()
     
