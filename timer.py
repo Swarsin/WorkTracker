@@ -4,7 +4,6 @@ from tkinter import messagebox
 work_min = 25
 short_break_min = 5
 long_break_min = 15
-sessions_before_long_break = 4
 work_goal = ""
 time_goal = 0
 
@@ -60,23 +59,16 @@ class ChangeTimingWindow(tk.Toplevel):
         self.long_break_entry = tk.Entry(self, width=20) 
         self.long_break_entry.grid(row=2, column=1, padx=10, pady=10)
 
-        # Add sessions before long break textbox
-        sessions_before_long_break_label = tk.Label(self, text="Sessions Before Long Break: ")
-        sessions_before_long_break_label.grid(row=3, column=0, padx=10, pady=10, sticky="e")
-        self.sessions_before_long_break_entry = tk.Entry(self, width=20)
-        self.sessions_before_long_break_entry.grid(row=3, column=1, padx=10, pady=10)
-
         # Add change button
         submit_button = tk.Button(self, text="Change", command=self.submit)
         submit_button.grid(row=4, column=1, padx=10, pady=10)
 
     def submit(self): #REMEMBER TO ADD VALIDATION SO THAT USER CANT ENTER STUPID SHIT
-        global work_min, short_break_min, long_break_min, sessions_before_long_break
+        global work_min, short_break_min, long_break_min
         work_min = int(self.work_entry.get())
         short_break_min = int(self.short_break_entry.get())  
         long_break_min = int(self.long_break_entry.get()) 
-        sessions_before_long_break = int(self.sessions_before_long_break_entry.get())
-        #print(work_min, short_break_min, long_break_min, sessions_before_long_break)
+        #print(work_min, short_break_min, long_break_min)
 
         self.pomodoro_timer.update_timer_labels()
         self.destroy()
@@ -147,19 +139,19 @@ class PomodoroTimer:
                 self.timer_seconds -= 1
                 self.timer_label.config(text=self.format_time(self.timer_seconds))
                 self.root.after(1000, self.update_timer)
-            else: #need to redo this part - it's not as i want it currently
+            else:
                 self.sessions_completed += 1
-                if self.sessions_completed % (sessions_before_long_break + 1) == 0:
+                if self.sessions_completed % 8 == 0:
                     self.timer_seconds = long_break_min * 60
-                    #messagebox.showinfo("Break Time", "Take a long break!")
+                    messagebox.showinfo("Break Time", "Take a long break!")
                     self.current_event = "Long Break!"
                 elif self.sessions_completed % 2 == 1:
                     self.timer_seconds = short_break_min * 60
-                    #messagebox.showinfo("Break Time", "Take a short break!")
+                    messagebox.showinfo("Break Time", "Take a short break!")
                     self.current_event = "Short Break!"
                 else:
                     self.timer_seconds = work_min * 60
-                    #messagebox.showinfo("Work Time", "Back to work!")
+                    messagebox.showinfo("Work Time", "Back to work!")
                     self.current_event = "Work!"
                 self.update_timer()
                 self.update_timer_labels()
