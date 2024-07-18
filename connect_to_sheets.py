@@ -9,11 +9,18 @@ client = gspread.authorize(creds)
 
 sheet = client.open("Habit Tracker").sheet1
 
+def find_next_empty_row():
+    str_list = list(filter(None, sheet.col_values(1)))  # Get all values in column A
+    return len(str_list) + 1
+
+#insert the values passed in as parameter to the google spreadsheet:
+def update_sheet(values):
+    sheet.insert_row(values, find_next_empty_row())
 
 #just trying out different ways to access data in the google spreadsheet:
 
 #retrieving data:
-print(sheet.get_all_records())
+#print(sheet.get_all_records())
 #print(sheet.row_values(1)) #seems like the first index of the sheet is 1, not 0 like normal
 #print(sheet.cell(2, 1).value)
 
@@ -31,4 +38,5 @@ print(sheet.get_all_records())
 # print(cell.value)
 # print(cell.row)
 # print(cell.col)
+
 
