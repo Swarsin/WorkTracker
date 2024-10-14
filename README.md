@@ -4,3 +4,4 @@ Created a program that tracks how much you work towards a set goal, and incorpor
 Current Goals/Improvements:
 - close all windows when end session
 - add chat gpt feature (open ai token) that gives suggestions on improving based on distractions
+- show trends/history in a graph using matplotlib?
